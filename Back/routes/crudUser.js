@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 dotenv.config(); 
 const SECRET_KEY = process.env.SECRET_KEY ;
 
+
+// vérifier la connexion et token
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
     console.log(token);
@@ -92,7 +94,7 @@ router.post('/loginUser', async (req, res) => {
         return res.status(500).json({ message: "Erreur interne du serveur" });
     }
 });
-
+// Info perso 
 router.post('/personnalInfo',  authenticateToken, (req, res) => {
     const {idUser} = req.body;
     const personnalInfo = "SELECT nameUser FROM user WHERE idUser = (?)"
@@ -102,6 +104,17 @@ router.post('/personnalInfo',  authenticateToken, (req, res) => {
     } );
 }
 )
+
+//Obtenir tout les user par tache
+router.get('/AllUserByTasks', authenticateToken, (req, res) => {
+    const {idTask} = req.body;
+    console.log(idTask);
+    const allUserByTasks = "SELECT u.nameUser FROM user u INNER JOIN user_task ut ON u.idUser = ut.idUser WHERE ut.idTask = (?)"
+    bdd.query(allUserByTasks,[idTask], (error, result) => {
+        if (error) throw error;
+        res.send(result)
+    } );
+});
 
 
 

@@ -10,7 +10,7 @@ const SECRET_KEY = process.env.SECRET_KEY ;
 
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
-    console.log(token);
+ 
     if (!token) return res.status(401).json({ error: 'Token manquant' });
 
     try {
@@ -125,25 +125,30 @@ router.post('/allTasks', authenticateToken, (req, res) => {
 });
 
 // Ajouter un utilisateur sur la tâche 
-
 router.post('/addUserToTask', authenticateToken, (req, res) => {
     const { nameUser, idTask } = req.body;
-    const searchUser = " select idUser from user where nameUser = ?"
+
+    const searchUser = "SELECT idUser FROM user WHERE nameUser = ?";
     bdd.query(searchUser, [nameUser], (error, result) => {
         if (error) throw error;
-        if(result.length === 0){
+
+        if (result.length === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
-        const idUserToAdd = result[0].idUser;
-        const addUserToTask = "INSERT INTO user_task (idUser, idTask) VALUES (?,?)";
-        bdd.query(addUserToTask, [idUserToAdd, idTask], (res, error) => {
-            if (error) throw error;
 
+        const idUserToAdd = result[0].idUser;
+
+        const addUserToTask = "INSERT INTO user_task (idUser, idTask) VALUES (?, ?)";
+        bdd.query(addUserToTask, [idUserToAdd, idTask], (err) => {
+            if (err) throw err;
+
+            console.log(idUserToAdd);
             console.log('Utilisateur ajouté à la tâche');
             res.status(200).json({ message: 'Utilisateur ajouté à la tâche' });
         });
     });
 });
+
 
 // Supprimer un utilisateur sur la tâche
 
@@ -168,27 +173,5 @@ router.post('/deleteUserFromTask', authenticateToken, (req, res) => {
 
 // Récupérer tout les utilisateurs lié à la tâche
 
-router.post('/allUsersFromTask', authenticateToken, (req, res) => {
-    const { idTask } = req.body;
-
-    // Vérifier que l'idTask est fourni
-    if (!idTask) {
-        return res.status(400).json({ error: 'idTask est requis' });
-    }
-
-    // SQL avec jointure entre user_task et user
-    const allUsersFromTask = `
-        SELECT u.* 
-        FROM user AS u
-        JOIN user_task AS ut ON u.idUser = ut.idUser
-        WHERE ut.idTask =?
-    `;
-
-    // Exécuter la requête
-    bdd.query(allUsersFromTask, [idTask], (error, result) => {
-        if (error) {
-            console.error("Erreur lors de la récupération des utilisateurs :", error);
-            return res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
-        }})})
 
 module.exports = router;
