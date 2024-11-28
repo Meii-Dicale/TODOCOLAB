@@ -33,7 +33,7 @@ router.post('/createTask', authenticateToken, (req, res) => {
     // Insérer la tâche dans la table `task`
     bdd.query(createTask, [libelleTask], (error, result) => {
         if (error) throw error;
-        console.log(result)
+        //console.log(result)
         
 
         const idTask = result.insertId; // Récupérer l'ID de la tâche créée
@@ -55,7 +55,7 @@ router.post('/createTask', authenticateToken, (req, res) => {
 
 router.get('/deleteTask/:id',authenticateToken, (req, res) => {
     const idTask = req.params.id;
-    console.log(idTask);
+    //console.log(idTask);
     const deleteTask = "DELETE FROM task WHERE idTask =(?)"
     bdd.query(deleteTask, [idTask], (error, result) => {
         if (error) throw error;
@@ -92,7 +92,7 @@ router.post('/updateStateTask/:id',authenticateToken, (req, res) => {
 
 router.post('/allTasks', authenticateToken, (req, res) => {
     const { idUser } = req.body;
-    console.log(idUser);
+    //console.log(idUser);
 
     // Vérifier que l'idUser est fourni
     if (!idUser) {
@@ -152,7 +152,7 @@ router.post('/addUserToTask', authenticateToken, (req, res) => {
 
 // Supprimer un utilisateur sur la tâche
 
-router.post('/deleteUserFromTask', authenticateToken, (req, res) => {
+router.post('/removeCollaborator', authenticateToken, (req, res) => {
     const { nameUser, idTask } = req.body;
     const searchUser = " select idUser from user where nameUser =?"
     bdd.query(searchUser, [nameUser], (error, result) => {

@@ -11,7 +11,7 @@ const SECRET_KEY = process.env.SECRET_KEY ;
 // vérifier la connexion et token
 const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
-    console.log(token);
+    console.log('token' +token);
     if (!token) return res.status(401).json({ error: 'Token manquant' });
 
     try {
@@ -106,7 +106,7 @@ router.post('/personnalInfo',  authenticateToken, (req, res) => {
 )
 
 //Obtenir tout les user par tache
-router.get('/AllUserByTasks', authenticateToken, (req, res) => {
+router.post('/AllUserByTasks', authenticateToken, (req, res) => {
     const {idTask} = req.body;
     console.log(idTask);
     const allUserByTasks = "SELECT u.nameUser FROM user u INNER JOIN user_task ut ON u.idUser = ut.idUser WHERE ut.idTask = (?)"
@@ -122,7 +122,7 @@ router.get('/AllUserByTasks', authenticateToken, (req, res) => {
 
 // Modifier un Utilisateur
 router.post('/changePassword', authenticateToken, async (req, res) => {
-    console.log(req.body);
+    
     const {idUser, passwordUser} = req.body;
     const securedPassword = await bcrypt.hash(passwordUser, 10)
     const updateUser = "UPDATE user SET  passwordUser =? WHERE idUser =?"
