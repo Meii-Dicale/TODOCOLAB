@@ -135,19 +135,24 @@ router.post('/addUserToTask', authenticateToken, (req, res) => {
         if (result.length === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
-
+    
         const idUserToAdd = result[0].idUser;
-
-        const addUserToTask = "INSERT INTO user_task (idUser, idTask) VALUES (?, ?)";
-        bdd.query(addUserToTask, [idUserToAdd, idTask], (err) => {
-            if (err) throw err;
-
-            console.log(idUserToAdd);
-            console.log('Utilisateur ajouté à la tâche');
-            res.status(200).json({ message: 'Utilisateur ajouté à la tâche' });
-        });
-    });
-});
+        const compareUser = "Select * from user_task where idUser = ? and idTask = ?";
+        bdd.query(compareUser, [idUserToAdd, idTask], (error, result) =>{
+            if(result.length > 0){
+                return res.status(400).json({ message: 'Utilisateur déjà présent sur la tâche' });
+            }
+            const addUserToTask = "INSERT INTO user_task (idUser, idTask) VALUES (?, ?)";
+            bdd.query(addUserToTask, [idUserToAdd, idTask], (err) => {
+                if (err) throw err;
+    
+                console.log(idUserToAdd);
+                console.log('Utilisateur ajouté à la tâche');
+                res.status(200).json({ message: 'Utilisateur ajouté à la tâche' });
+            })}
+        )})});
+            
+       
 
 
 // Supprimer un utilisateur sur la tâche
